@@ -1,4 +1,3 @@
-from typing import Optional
 import discord
 import time
 from discord.ext import commands
@@ -30,67 +29,60 @@ async def hello(ctx):
 
 
 @client.command()
-async def everyone(ctx):
-    for guild in client.guilds:
-        for user in guild.members:
-            if user != None:                
-                await ctx.send(f'<@{user.id}>')
+async def bootup(ctx, *args):
+    for user in args:
+        try:
+            converter = MemberConverter()
+            user = await converter.convert(ctx, user)
+            try:
+                victim = client.get_user(user.id)
+                for i in range(5):
+                    await victim.send(f'<@{user.id}> Boot up!')
+                    await ctx.send(f'<@{user.id}> Boot up!')
+                    await asyncio.sleep(.75) 
+            except:
+                for i in range(5):
+                    await ctx.send(f'<@{user.id}> Boot up!')
+                    await asyncio.sleep(.75) 
+        except:
+            print(f"Who is {user}???")
+            await ctx.send('User not found. Try again.')
 
 
 @client.command()
-async def mention(ctx, *, user: discord.User=None):
-    if user != None:        
-        for i in range(10):
-            await ctx.send(f'<@{user.id}>')
-            time.sleep(1)
-            await ctx.send("Boot up")
-            time.sleep(1.25)
+async def bootupLater(ctx, *args):
+    if (args[-1] == "hours" or args[-1] == "minutes" or args[-1] == "seconds"):
+        print(f"Booting them up in {args[-2]} {args[-1]}")
+        if args[-1] == "hours":
+            seconds = (int(args[-2]) * 3600)
+        elif args[-1] == "minutes":
+            seconds = (int(args[-2]) * 60)
+        elif args[-1] == "seconds":
+            seconds = (int(args[-2]))
+            
+        await ctx.send(f"Booting them up in {args[-2]} {args[-1]}.")
+        await asyncio.sleep(seconds) 
+            
+        for user in args[0: -2]:
+            try:
+                converter = MemberConverter()
+                user = await converter.convert(ctx, user)
+                try:
+                    victim = client.get_user(user.id)
+                    for i in range(5):
+                        await victim.send(f'<@{user.id}> Boot up!')
+                        await ctx.send(f'<@{user.id}> Boot up!')
+                        await asyncio.sleep(.75) 
+                except:
+                    for i in range(5):
+                        await ctx.send(f'<@{user.id}> Boot up!')
+                        await asyncio.sleep(.75) 
+            except:
+                print(f"Who is {user}???")
+                await ctx.send('User not found. Try again.')
     else:
-        await ctx.send('User not found. Try again.')
+        await ctx.send('Unknown input. Try again using "$bootupLater (username [multiple]) (time) (plural units).')
 
 
-@client.command()
-async def bootup(ctx, *, user: discord.User=None):
-    if user != None:
-        victim = client.get_user(user.id)
-        for i in range(10):
-            await victim.send("Boot up")
-            await ctx.send(f'<@{user.id}>')
-            time.sleep(1)
-            await ctx.send("Boot up")
-            time.sleep(1.25)
-    else:
-        await ctx.send('User not found. Try again.')
-        
-
-@client.command()
-async def bootupPlan(ctx, *args):
-    #try:
-    print(f"Booting up {args[0]} in {args[1]} {args[2]}")
-    if args[2] == "hours":
-        seconds = (int(args[1]) * 3600)
-    elif args[2] == "minutes":
-        seconds = (int(args[1]) * 60)
-    elif args[2] == "seconds":
-        seconds = (int(args[1]))
-        
-    await ctx.send(f"Booting up {args[0]} in {args[1]} {args[2]}.")
-    
-    await asyncio.sleep(seconds) 
-        
-    converter = MemberConverter()
-    user = await converter.convert(ctx, args[0])
-        
-    if user != None:
-        for i in range(10):
-            await ctx.send(f'<@{user.id}>')
-            time.sleep(1)
-            await ctx.send("Boot up")
-            time.sleep(1.25)
-    else:
-        await ctx.send('User not found. Try again.')
-
-    #except:
-        #await ctx.send('No time specified. Try again with format "$bootupPlan {user} {time} {unit of seconds}."')
 
 client.run(BOTTOKEN)
